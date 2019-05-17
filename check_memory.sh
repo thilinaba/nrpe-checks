@@ -13,6 +13,7 @@ then
     echo "Usage: $USAGE"
     exit 0
 fi
+
 # read input
 while [[ $# -gt 0 ]]
   do
@@ -39,20 +40,17 @@ fi
 
 MEM_TOTAL=`cat /proc/meminfo | grep "MemTotal" | awk '{print $2}'`
 MEM_AVAILABLE=`cat /proc/meminfo | grep "MemAvailable" | awk '{print $2}'`
-MEM_AVAILABLE_PERCENTAGE=`expr ($MEMORY_AVAILABLE / $MEM_TOTAL) * 100`
-
-echo Total: $MEM_TOTAL
-echo Available: $MEM_AVAILABLE
-echo Avl Pcnt: $MEM_AVAILABLE_PERCENTAGE
+MEM_AVAILABLE_PERCENTAGE=$(($MEM_AVAILABLE*100/$MEM_TOTAL))
 
 if [[ $MEM_AVAILABLE_PERCENTAGE -le  $CRITICAL_PERCENTAGE ]]
     then
         echo "CRITICAL - $free MB ($percent%) Free Memory"
-        exit 2
+        exit $STATE_CRITICAL
 elif [[ $MEM_AVAILABLE_PERCENTAGE -le  $WARNING_PERCENTAGE ]]
+then
     echo "WARNING - $free MB ($percent%) Free Memory"
-    exit 1
+    exit $STATE_WARNING
 else
     echo "OK - $free MB ($percent%) Free Memory"
-    exit 0
+    exit $STATE_OK
 fi
