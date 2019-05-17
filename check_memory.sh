@@ -1,5 +1,7 @@
-USAGE_MSG="`basename $0` [-w|--warning]<percent free> [-c|--critical]<percent free>"
-THRESHOLD_USAGE_MSG="WARNING threshold must be greater than CRITICAL: `basename $0` $*"
+USAGE_MSG="`basename $0` [-w|--warning]<percent used> [-c|--critical]<percent used>"
+USAGE_EXAMPLE_MSG="`basename $0` -w 75 -c 90"
+THRESHOLD_USAGE_MSG="WARNING threshold must be less than CRITICAL threshold"
+
 
 STATE_OK=0
 STATE_WARNING=1
@@ -10,7 +12,8 @@ STATE_UNKNOWN=3
 if [[ $# -lt 4 ]]
 then
     echo "Wrong Syntax: `basename $0` $*"
-    echo "Usage: $USAGE"
+    echo "Usage: $USAGE_MSG"
+    echo "Example: $USAGE_EXAMPLE_MSG"
     exit 0
 fi
 
@@ -31,26 +34,33 @@ while [[ $# -gt 0 ]]
   done
 
 # verify input
-if [[ $WARNING_PERCENTAGE -le $CRITICAL_PERCENTAGE ]]
+if [[ $WARNING_PERCENTAGE -ge $CRITICAL_PERCENTAGE ]]
 then
-    echo "$THRESHOLD_USAGE"
-    echo "Usage: $USAGE"
+    echo "$THRESHOLD_USAGE_MSG"
+    echo "Usage: $USAGE_MSG"
+    echo "Example: $USAGE_EXAMPLE_MSG"
     exit 0
 fi
 
 MEM_TOTAL=`cat /proc/meminfo | grep "MemTotal" | awk '{print $2}'`
 MEM_AVAILABLE=`cat /proc/meminfo | grep "MemAvailable" | awk '{print $2}'`
-MEM_AVAILABLE_PERCENTAGE=$(($MEM_AVAILABLE*100/$MEM_TOTAL))
+MEM_USED=$(($MEM_TOTAL-$MEM_AVAILABLE))
+MEM_USED_PERCENTAGE=$(($MEM_USED*100/$MEM_TOTAL))
 
-if [[ $MEM_AVAILABLE_PERCENTAGE -le  $CRITICAL_PERCENTAGE ]]
+echo Tot: $MEM_TOTAL
+echo Avl: $MEM_AVAILABLE
+echo used: $MEM_USED
+echo used pcnt: $MEM_USED_PERCENTAGE
+
+if [[ $MEM_USED_PERCENTAGE -ge  $CRITICAL_PERCENTAGE ]]
     then
-        echo "CRITICAL - $free MB ($percent%) Free Memory"
+        echo "CRITICAL - $(($MEM_USED/1000)) MB ($MEM_USED_PERCENTAGE%) Used Memory"
         exit $STATE_CRITICAL
-elif [[ $MEM_AVAILABLE_PERCENTAGE -le  $WARNING_PERCENTAGE ]]
+elif [[ $MEM_USED_PERCENTAGE -ge  $WARNING_PERCENTAGE ]]
 then
-    echo "WARNING - $free MB ($percent%) Free Memory"
+    echo "WARNING - $(($MEM_USED/1000)) MB ($MEM_USED_PERCENTAGE%) Used Memory"
     exit $STATE_WARNING
 else
-    echo "OK - $free MB ($percent%) Free Memory"
+    echo "OK - $(($MEM_USED/1000)) MB ($MEM_USED_PERCENTAGE%) Used Memory"
     exit $STATE_OK
 fi
