@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # This script checks the memory "Usage" (not how much left)
 # Add the "used memory" percentage in Warn and Critical levels
 # Eg: 
