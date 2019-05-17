@@ -1,3 +1,11 @@
+# This script checks the memory "Usage" (not how much left)
+# Add the "used memory" percentage in Warn and Critical levels
+# Eg: 
+# check_memory.sh -w 70 -c 90
+#
+#    "-w 70" means it will warn you when Used memory goes ABOVE 70%
+#    "-c 90" means it will give you a critical alert when Used memory goes Above 90%
+
 USAGE_MSG="`basename $0` [-w|--warning]<percent used> [-c|--critical]<percent used>"
 USAGE_EXAMPLE_MSG="`basename $0` -w 75 -c 90"
 THRESHOLD_USAGE_MSG="WARNING threshold must be less than CRITICAL threshold"
