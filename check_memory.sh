@@ -52,15 +52,16 @@ then
     exit 0
 fi
 
-MEM_TOTAL=`cat /proc/meminfo | grep "MemTotal" | awk '{print $2}'`
-MEM_AVAILABLE=`cat /proc/meminfo | grep "MemAvailable" | awk '{print $2}'`
+MEM_TOTAL=$(cat /proc/meminfo | grep "MemTotal" | awk '{print $2}')
+MEM_AVAILABLE=$(cat /proc/meminfo | grep "MemAvailable" | awk '{print $2}')
 MEM_USED=$(($MEM_TOTAL-$MEM_AVAILABLE))
 MEM_USED_PERCENTAGE=$(($MEM_USED*100/$MEM_TOTAL))
 
-echo Tot: $MEM_TOTAL
-echo Avl: $MEM_AVAILABLE
-echo used: $MEM_USED
-echo used pcnt: $MEM_USED_PERCENTAGE
+# Debug echos
+# echo Tot: $MEM_TOTAL
+# echo Avl: $MEM_AVAILABLE
+# echo used: $MEM_USED
+# echo used pcnt: $MEM_USED_PERCENTAGE
 
 if [[ $MEM_USED_PERCENTAGE -ge  $CRITICAL_PERCENTAGE ]]
     then
